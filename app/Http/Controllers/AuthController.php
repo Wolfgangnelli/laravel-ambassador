@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Hash;
@@ -23,5 +24,30 @@ class AuthController extends Controller
         }
 
         return response($user, Response::HTTP_CREATED);
+    }
+
+    /**
+     * LOGIN USER ->
+     * Verify if the request contain email and password, if is ok take the user logged
+     * and create a jwt token for it
+     *
+     * @return token
+     */
+    public function login(Request $request)
+    {
+        if (!\Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return response([
+                'error' => 'Invalid credentials'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $user = \Auth::user();
+        $jwt = $user->createToken('token')->plainTextToken;
+
+        $cookie = cookie('jwt', $jwt, 60 * 24); // 1 day
+
+        return response([
+            'message' => 'success'
+        ])->withCookie($cookie);
     }
 }
