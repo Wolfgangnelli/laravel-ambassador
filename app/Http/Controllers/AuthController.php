@@ -60,4 +60,14 @@ class AuthController extends Controller
             'message' => 'success'
         ])->withCookie($cookie);
     }
+
+    /**
+     * Authenticated user
+     *
+     * @return $user
+     */
+    public function user(Request $request)
+    {
+        return $request->user();
+    }
 }
