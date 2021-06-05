@@ -11,6 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+
+    /**
+     * Create an user, hash the password and return the user
+     * @param string $first_name
+     * @param string $last_name
+     * @param string $email
+     * @param string $password
+     *
+     *@return $user
+     */
     public function register(RegisterRequest $request)
     {
         if ($request->has(['first_name', 'last_name', 'email'])) {
