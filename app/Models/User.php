@@ -34,6 +34,10 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
+ * @property-read int|null $tokens_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User ambassadors()
+ * @method static \Illuminate\Database\Eloquent\Builder|User admins()
  */
 class User extends Authenticatable
 {
@@ -50,4 +54,23 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    /**
+     * get Ambassadors, local scope function
+     *
+     * @param $query
+     * @return $ambassadors
+     */
+    public function scopeAmbassadors($query)
+    {
+        return $query->where('is_admin', 0);
+    }
+
+    /**
+     * get admins
+     */
+    public function scopeAdmins($query)
+    {
+        return $query->where('is_admin', 1);
+    }
 }
