@@ -49,6 +49,9 @@ Route::prefix('admin')->group(function () {
 //Ambassador Authentication Endpoints
 Route::prefix('ambassador')->group(function () {
     common('scope.ambassador');
+
+    Route::get('products/frontend', [ProductController::class, 'frontend']);
+    ROute::get('products/backend', [ProductController::class, 'backend']);
 });
 
 
