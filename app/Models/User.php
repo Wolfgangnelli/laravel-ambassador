@@ -38,6 +38,9 @@ use Illuminate\Notifications\Notifiable;
  * @property-read int|null $tokens_count
  * @method static \Illuminate\Database\Eloquent\Builder|User ambassadors()
  * @method static \Illuminate\Database\Eloquent\Builder|User admins()
+ * @property-read mixed $revenue
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Order[] $orders
+ * @property-read int|null $orders_count
  */
 class User extends Authenticatable
 {
@@ -54,6 +57,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
     /**
      * get Ambassadors, local scope function
@@ -72,5 +80,11 @@ class User extends Authenticatable
     public function scopeAdmins($query)
     {
         return $query->where('is_admin', 1);
+    }
+
+
+    public function getRevenueAttribute()
+    {
+        return $this->orders->sum(fn (Order $order) => $order->ambassador_revenue);
     }
 }
