@@ -89,12 +89,26 @@ class ProductController extends Controller
         return $products;
     }
 
-    public function backend()
+    public function backend(Request $request)
     {
+        //clear the cache
+        //Cache::forget('products_backend');
+
+        $page = $request->input('page', 1);
         $ttl = 30 * 60;
 
-        return Cache::remember('products_backend', $ttl, function () {
-            return Product::paginate();
-        });
+        $products = collect(Cache::remember('products_backend', $ttl, fn () => Product::all()));
+        $totalProducts = $products->count();
+        $lastPage = ceil($totalProducts / 9);
+
+        //manually paginate using collections
+        return [
+            'data' => $products->forPage($page, 9)->values(),
+            'meta' => [
+                'total' => $totalProducts,
+                'page' => $page,
+                'last_page' => $lastPage
+            ]
+        ];
     }
 }
