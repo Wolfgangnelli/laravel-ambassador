@@ -19,17 +19,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Admin
-Route::prefix('admin')->group(function () {
+function common(string $scope)
+{
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
-    Route::middleware(['auth:sanctum', 'scope.admin'])->group(function () {
+    Route::middleware(['auth:sanctum', $scope])->group(function () {
         Route::get('user', [AuthController::class, 'user']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::put('users/info', [AuthController::class, 'updateInfo']);
         Route::put('users/password', [AuthController::class, 'updatePassword']);
+    });
+}
 
+//Admin
+Route::prefix('admin')->group(function () {
+    common('scope.admin');
+
+    Route::middleware(['auth:sanctum', 'scope.admin'])->group(function () {
         Route::get('ambassadors', [AmbassadorController::class, 'index']);
         Route::get('users/{id}/links', [LinkController::class, 'index']);
         ROute::get('orders', [OrderController::class, 'index']);
@@ -39,8 +46,10 @@ Route::prefix('admin')->group(function () {
 });
 
 
-//Ambassador
-
+//Ambassador Authentication Endpoints
+Route::prefix('ambassador')->group(function () {
+    common('scope.ambassador');
+});
 
 
 //Checkout
