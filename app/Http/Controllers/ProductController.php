@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Cache;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,11 +77,24 @@ class ProductController extends Controller
      */
     public function frontend()
     {
-        return Product::all();
+        // get the products from redis cache if they exist on it, so i don't query the db
+        if ($products = \Cache::get('products_frontend')) {
+            return $products;
+        }
+
+        //sleep(2);
+        $products = Product::all();
+        Cache::set('products_frontend', $products, 30 * 60); // 30 minuts (30 * 60seconds)
+
+        return $products;
     }
 
     public function backend()
     {
-        return Product::paginate();
+        $ttl = 30 * 60;
+
+        return Cache::remember('products_backend', $ttl, function () {
+            return Product::paginate();
+        });
     }
 }
