@@ -33,7 +33,7 @@ function common(string $scope)
     });
 }
 
-//Admin
+//Admin Endpoints
 Route::prefix('admin')->group(function () {
     common('scope.admin');
 
@@ -47,7 +47,7 @@ Route::prefix('admin')->group(function () {
 });
 
 
-//Ambassador Authentication Endpoints
+//Ambassador Endpoints
 Route::prefix('ambassador')->group(function () {
     common('scope.ambassador');
 
@@ -62,4 +62,4 @@ Route::prefix('ambassador')->group(function () {
 });
 
 
-//Checkout
+//Checkout Endpoints
