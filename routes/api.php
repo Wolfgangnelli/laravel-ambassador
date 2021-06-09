@@ -33,7 +33,7 @@ function common(string $scope)
     });
 }
 
-//Admin
+//Admin Endpoints
 Route::prefix('admin')->group(function () {
     common('scope.admin');
 
