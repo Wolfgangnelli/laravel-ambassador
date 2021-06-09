@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Common routes
 function common(string $scope)
 {
     Route::post('/register', [AuthController::class, 'register']);
