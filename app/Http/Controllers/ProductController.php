@@ -131,8 +131,8 @@ class ProductController extends Controller
     {
         if ($s = $request->input('s')) {
             $products = $products->filter(fn (Product $product) => Str::contains($product->title, $s) || Str::contains($product->description, $s));
-            return $products;
         }
+        return $products;
     }
     /**
      * Sorting products filtered
