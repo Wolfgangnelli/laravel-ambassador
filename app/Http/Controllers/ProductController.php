@@ -101,9 +101,11 @@ class ProductController extends Controller
         $products = collect(Cache::remember('products_backend', $ttl, fn () => Product::all()));
 
         //searching products
-        if ($s = $request->input('s')) {
-            $products = $products->filter(fn (Product $product) => Str::contains($product->title, $s) || Str::contains($product->description, $s));
-        }
+        $products = $this->searching($request, $products);
+
+        //sorting products
+        $products = $this->sorting($request, $products);
+
         $totalProducts = $products->count();
         $lastPage = ceil($totalProducts / 9);
 
@@ -116,5 +118,43 @@ class ProductController extends Controller
                 'last_page' => $lastPage
             ]
         ];
+    }
+
+    /**
+     * Searching products through the param passed in the request, into the product title or description
+     * @param Collection $products
+     *
+     * @return $products
+     *
+     */
+    public function searching($request, $products)
+    {
+        if ($s = $request->input('s')) {
+            $products = $products->filter(fn (Product $product) => Str::contains($product->title, $s) || Str::contains($product->description, $s));
+            return $products;
+        }
+    }
+    /**
+     * Sorting products filtered
+     *
+     * @param Collection $products
+     *
+     * @return $products
+     */
+    public function sorting($request, $products)
+    {
+        if ($sort = $request->input('sort')) {
+            if ($sort === 'asc') {
+                $products = $products->sortBy([
+                    fn ($a, $b) => $a['price'] <=> $b['price']
+                ]);
+            } else if ($sort === 'desc') {
+                $products = $products->sortBy([
+                    fn ($a, $b) => $b['price'] <=> $a['price']
+                ]);
+            }
+        }
+
+        return $products;
     }
 }
