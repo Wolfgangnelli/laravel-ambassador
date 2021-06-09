@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
@@ -98,6 +99,11 @@ class ProductController extends Controller
         $ttl = 30 * 60;
 
         $products = collect(Cache::remember('products_backend', $ttl, fn () => Product::all()));
+
+        //searching products
+        if ($s = $request->input('s')) {
+            $products = $products->filter(fn (Product $product) => Str::contains($product->title, $s) || Str::contains($product->description, $s));
+        }
         $totalProducts = $products->count();
         $lastPage = ceil($totalProducts / 9);
 
