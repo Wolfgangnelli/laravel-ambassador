@@ -47,7 +47,7 @@ Route::prefix('admin')->group(function () {
 });
 
 
-//Ambassador Authentication Endpoints
+//Ambassador Endpoints
 Route::prefix('ambassador')->group(function () {
     common('scope.ambassador');
 
@@ -62,7 +62,7 @@ Route::prefix('ambassador')->group(function () {
 });
 
 
-//Checkout
+//Checkout Endpoints
 Route::prefix('checkout')->group(function () {
     Route::get('links/{code}', [LinkController::class, 'show']);
 });
