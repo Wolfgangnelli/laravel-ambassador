@@ -9,6 +9,10 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Cartalyst\Stripe\Laravel\Facades\Stripe;
+//use Cartalyst\Stripe\Stripe;
+
+
 
 class OrderController extends Controller
 {
@@ -40,6 +44,8 @@ class OrderController extends Controller
 
             $order->save();
 
+            $lineItems = [];
+
             foreach ($request->input('products') as $item) {
                 $product = Product::find($item['product_id']);
 
@@ -52,14 +58,42 @@ class OrderController extends Controller
                 $orderItem->admin_revenue = 0.9 * $product->price * $item['quantity'];
 
                 $orderItem->save();
+                $lineItems[] = [
+                    'name' => $product->title,
+                    'description' => $product->description,
+                    'images' => [
+                        $product->image
+                    ],
+                    'amount' => 100 * $product->price,   //l'amount è in cents, lo moltiplico x 100 così è in dollar
+                    'currency' => 'usd',
+                    'quantity' => $item['quantity']
+                ];
             }
+
+            $stripe = Stripe::make(env('STRIPE_SECRET'));
+            // FORMAT THAT STRIPE NEED IN ORDER TO SEE THE PRODUCTS IN A NICE CHECKOUT FORM
+            $source = $stripe->checkout()->sessions()->create([
+                'payment_method_types' => ['card'],
+                'line_items' => $lineItems,
+                'success_url' => env('CHECKOUT_URL') . '/success?source={CHECKOUT_SESSION_ID}',  //used to confim the order in the end
+                'cancel_url' => env('CHECKOUT_URL') . '/error'
+            ]);
+
+            //source return lots of objs
+            //when create an order i need olso to send a transaction_id to store in db
+            $order->transaction_id = $source['id'];
+            $order->save();
+
             DB::commit();
+
+            //in frontend i will use this obj in order to redirect to stripe and to pay, and the i will go to success page and confirm the order
+            return $source;  //$order->load('orderItems')
         } catch (\Throwable $e) {
             DB::rollback();
-            abort(500, 'An error happend');
+
+            return response([
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-
-        return $order->load('orderItems');
     }
 }
