@@ -21,6 +21,11 @@ class OrderController extends Controller
         return OrderResource::collection(Order::with('orderItems')->get());
     }
 
+    /**
+     * Create a order and order items. I use Stripe for payment and return an obj of information if is all ok.
+     *
+     * @return Object
+     */
     public function store(Request $request)
     {
         if (!$link = Link::where('code', $request->input('code'))->first()) {
@@ -58,6 +63,7 @@ class OrderController extends Controller
                 $orderItem->admin_revenue = 0.9 * $product->price * $item['quantity'];
 
                 $orderItem->save();
+
                 $lineItems[] = [
                     'name' => $product->title,
                     'description' => $product->description,
@@ -96,4 +102,28 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
+
+    /**
+     * Confirm the order
+     *
+     * @return $message
+     */
+    public function confirm(Request $request)
+    {
+        if (!$order = Order::where('transaction_id', $request->input('source'))->first()) {
+            return response([
+                'error' => 'Order not found'
+            ], 404);
+        }
+
+        $order->complete = 1;
+        $order->save();
+
+        return response([
+            'message' => 'success'
+        ], 201);
+    }
+
+    //After order is confirmed i send an email to ambassador
 }
