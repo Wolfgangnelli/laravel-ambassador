@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 function common(string $scope)
 {
+
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
