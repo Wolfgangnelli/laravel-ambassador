@@ -19,7 +19,7 @@ class CreateLinkProductsTable extends Migration
             $table->unsignedBigInteger('product_id');
 
             $table->foreign('link_id')->references('id')->on('links');
-            $table->foreign('product_id')->references('id')->on('products');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
