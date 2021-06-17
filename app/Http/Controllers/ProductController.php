@@ -100,6 +100,7 @@ class ProductController extends Controller
         return $products;
     }
 
+
     public function backend(Request $request)
     {
         //clear the cache
@@ -108,7 +109,7 @@ class ProductController extends Controller
         $page = $request->input('page', 1);
         $ttl = 30 * 60;
 
-        $products = collect(Cache::remember('products_backend', $ttl, fn () => Product::all()));
+        $products = Cache::remember('products_backend', $ttl, fn () => Product::all());
 
         //searching products
         $products = $this->searching($request, $products);
@@ -141,8 +142,8 @@ class ProductController extends Controller
     {
         if ($s = $request->input('s')) {
             $products = $products->filter(fn (Product $product) => Str::contains($product->title, $s) || Str::contains($product->description, $s));
-            return $products;
         }
+        return $products;
     }
     /**
      * Sorting products filtered
