@@ -59,6 +59,9 @@ class User extends Authenticatable
         'password',
     ];
 
+    /**
+     * Relationship. Get the orders associated with the user.
+     */
     public function orders()
     {
         return $this->hasMany(Order::class)->where('complete', 1);
@@ -83,6 +86,7 @@ class User extends Authenticatable
         return $query->where('is_admin', 1);
     }
 
+    // HELPER FUNCTIONS - Accessors, Mutators
 
     public function getRevenueAttribute()
     {
