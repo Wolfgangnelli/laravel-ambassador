@@ -29,7 +29,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->hasAny('title', 'price', 'imege')) {
+        if ($request->hasAny('title', 'price', 'image')) {
             $product = Product::create($request->only('title', 'description', 'price', 'image'));
         }
 
